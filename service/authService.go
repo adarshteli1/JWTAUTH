@@ -62,7 +62,7 @@ func Signup(user models.User) (interface{}, error) {
 
 	result, err := userCollection.InsertOne(ctx, user)
 	if err != nil {
-		return nil, errors.New("user item was not created")
+		return nil, errors.New("User was not created")
 	}
 
 	return result, nil
@@ -80,7 +80,7 @@ func Login(user models.User) (models.User, error) {
 	}).Decode(&foundUser)
 
 	if err != nil {
-		return models.User{}, errors.New("email or password is incorrect")
+		return models.User{}, errors.New("Email or Password is Incorrect")
 	}
 
 	passwordIsValid, msg := helpers.VerifyPassword(*foundUser.Password, *user.Password)
@@ -90,7 +90,7 @@ func Login(user models.User) (models.User, error) {
 	}
 
 	if foundUser.Email == "" {
-		return models.User{}, errors.New("user not found")
+		return models.User{}, errors.New("User not found")
 	}
 
 	token, refreshToken, err := helpers.GenerateAllTokens(
