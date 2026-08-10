@@ -64,6 +64,11 @@ func GenerateAllTokens(email string, firstname string, lastname string, uid stri
 		},
 	}
 	refreshClaims := &SignedDetails{
+		Email:      email,
+		First_name: firstname,
+		Last_name:  lastname,
+		Uid:        uid,
+		User_type:  userType,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(168)).Unix(),
 		},
@@ -79,12 +84,11 @@ func GenerateAllTokens(email string, firstname string, lastname string, uid stri
 	return token, refreshtoken, err
 }
 
-func UpdateAllTokens(signedToken string, signedRefreshToken string, userId string) {
+func UpdateAllTokens(signedRefreshToken string, userId string) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 	defer cancel()
 	var updateObj primitive.D
 
-	updateObj = append(updateObj, bson.E{Key: "token", Value: signedToken})
 	updateObj = append(updateObj, bson.E{Key: "refresh_token", Value: signedRefreshToken})
 
 	Updated_at, _ := time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))

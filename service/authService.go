@@ -13,21 +13,27 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+type AuthResponse struct {
+	User         models.UserResponse `json:"user"`
+	Token        string              `json:"token"`
+	RefreshToken string              `json:"refresh_token"`
+}
+
 var validate = validator.New()
 
-func Signup(user models.User) (interface{}, error) {
+func Signup(user models.User) (AuthResponse, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 	defer cancel()
 
 	if err := validate.Struct(user); err != nil {
-		return nil, err
+		return AuthResponse{}, err
 	}
 
 	count, err := userCollection.CountDocuments(ctx, bson.M{"email": user.Email})
 	if err != nil {
 		log.Panic(err)
-		return nil, errors.New("error while checking for the email")
+		return AuthResponse{}, errors.New("error while checking for the email")
 	}
 
 	password := helpers.HashPassword(*user.Password)
@@ -36,11 +42,11 @@ func Signup(user models.User) (interface{}, error) {
 	count, err = userCollection.CountDocuments(ctx, bson.M{"phone": user.Phone})
 	if err != nil {
 		log.Panic(err)
-		return nil, errors.New("error while checking for the phone")
+		return AuthResponse{}, errors.New("error while checking for the phone")
 	}
 
 	if count > 0 {
-		return nil, errors.New("this email or phone number already exists")
+		return AuthResponse{}, errors.New("this email or phone number already exists")
 	}
 
 	user.Created_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
@@ -57,18 +63,31 @@ func Signup(user models.User) (interface{}, error) {
 		*user.User_type,
 	)
 
-	user.Token = &token
 	user.Refresh_token = &refreshToken
 
-	result, err := userCollection.InsertOne(ctx, user)
+	_, err = userCollection.InsertOne(ctx, user)
 	if err != nil {
-		return nil, errors.New("User was not created")
+		return AuthResponse{}, errors.New("User was not created")
 	}
 
-	return result, nil
+	userResponse := models.UserResponse{
+		ID:         user.ID,
+		First_name: user.First_name,
+		Last_name:  user.Last_name,
+		Email:      user.Email,
+		Phone:      user.Phone,
+		User_type:  user.User_type,
+		User_id:    user.User_id,
+	}
+
+	return AuthResponse{
+		User:         userResponse,
+		Token:        token,
+		RefreshToken: refreshToken,
+	}, nil
 }
 
-func Login(user models.User) (models.User, error) {
+func Login(user models.User) (AuthResponse, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 	defer cancel()
@@ -80,17 +99,17 @@ func Login(user models.User) (models.User, error) {
 	}).Decode(&foundUser)
 
 	if err != nil {
-		return models.User{}, errors.New("Email or Password is Incorrect")
+		return AuthResponse{}, errors.New("Email or Password is Incorrect")
 	}
 
 	passwordIsValid, msg := helpers.VerifyPassword(*foundUser.Password, *user.Password)
 
 	if !passwordIsValid {
-		return models.User{}, errors.New(msg)
+		return AuthResponse{}, errors.New(msg)
 	}
 
 	if foundUser.Email == "" {
-		return models.User{}, errors.New("User not found")
+		return AuthResponse{}, errors.New("User not found")
 	}
 
 	token, refreshToken, err := helpers.GenerateAllTokens(
@@ -102,18 +121,24 @@ func Login(user models.User) (models.User, error) {
 	)
 
 	if err != nil {
-		return models.User{}, err
+		return AuthResponse{}, err
 	}
 
-	helpers.UpdateAllTokens(token, refreshToken, foundUser.User_id)
+	helpers.UpdateAllTokens(refreshToken, foundUser.User_id)
 
-	err = userCollection.FindOne(ctx, bson.M{
-		"user_id": foundUser.User_id,
-	}).Decode(&foundUser)
-
-	if err != nil {
-		return models.User{}, err
+	userResponse := models.UserResponse{
+		ID:         foundUser.ID,
+		First_name: foundUser.First_name,
+		Last_name:  foundUser.Last_name,
+		Email:      foundUser.Email,
+		Phone:      foundUser.Phone,
+		User_type:  foundUser.User_type,
+		User_id:    foundUser.User_id,
 	}
 
-	return foundUser, nil
+	return AuthResponse{
+		User:         userResponse,
+		Token:        token,
+		RefreshToken: refreshToken,
+	}, nil
 }
