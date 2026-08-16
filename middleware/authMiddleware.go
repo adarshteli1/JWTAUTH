@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"JWTAUTH/helpers"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,9 +10,10 @@ import (
 func Authenticate() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
+
 		clientToken := c.Request.Header.Get("token")
 		if clientToken == "" {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("No Authorization Header Provided")})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "No Authorization Header Provided"})
 			c.Abort()
 			return
 		}
@@ -33,4 +33,31 @@ func Authenticate() gin.HandlerFunc {
 		c.Next()
 	}
 
+}
+func MatchUserID() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		userId := c.Param("user_id")
+
+		if err := helpers.MatchUserTypeToUid(c, userId); err != nil {
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+			c.Abort()
+			return
+		}
+
+		c.Next()
+	}
+}
+
+func AdminOnly() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		if err := helpers.CheckUserType(c, "ADMIN"); err != nil {
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+			c.Abort()
+			return
+		}
+
+		c.Next()
+	}
 }
