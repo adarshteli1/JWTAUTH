@@ -16,12 +16,15 @@ var userCollection *mongo.Collection = database.OpeCollection(database.Client, "
 
 func GetUsers(c *gin.Context) ([]bson.M, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
 	defer cancel()
 
 	recordPerPage, err := strconv.Atoi(c.Query("recordPerPage"))
 	if err != nil || recordPerPage < 1 {
 		recordPerPage = 10
+	}
+	if recordPerPage > 100 {
+		recordPerPage = 100
 	}
 
 	page, err := strconv.Atoi(c.Query("page"))
@@ -34,7 +37,19 @@ func GetUsers(c *gin.Context) ([]bson.M, error) {
 	matchStage := bson.D{
 		{Key: "$match", Value: bson.D{}},
 	}
-
+	projectUserStage := bson.D{
+		{
+			Key: "$project", Value: bson.D{
+				{Key: "_id", Value: 1},
+				{Key: "id", Value: 1},
+				{Key: "first_name", Value: 1},
+				{Key: "last_name", Value: 1},
+				{Key: "email", Value: 1},
+				{Key: "phone", Value: 1},
+				{Key: "user_type", Value: 1},
+			},
+		},
+	}
 	groupStage := bson.D{
 		{Key: "$group", Value: bson.D{
 			{Key: "_id", Value: nil},
@@ -63,6 +78,7 @@ func GetUsers(c *gin.Context) ([]bson.M, error) {
 
 	result, err := userCollection.Aggregate(ctx, mongo.Pipeline{
 		matchStage,
+		projectUserStage,
 		groupStage,
 		projectStage,
 	})
