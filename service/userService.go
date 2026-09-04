@@ -96,9 +96,9 @@ func GetUsers(c *gin.Context) ([]bson.M, error) {
 	return allUsers, nil
 }
 
-func GetUser(userId string) (models.User, error) {
+func GetUser(userId string, c *gin.Context) (models.User, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 100*time.Second)
 	defer cancel()
 
 	var user models.User
