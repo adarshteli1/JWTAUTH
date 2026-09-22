@@ -19,7 +19,7 @@ func Signup() gin.HandlerFunc {
 
 		result, err := services.Signup(user)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return
 		}
 
@@ -38,7 +38,7 @@ func Login() gin.HandlerFunc {
 
 		foundUser, err := services.Login(user)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return
 		}
 

@@ -30,7 +30,7 @@ func GetUser() gin.HandlerFunc {
 
 		userId := c.Param("user_id")
 
-		user, err := services.GetUser(userId)
+		user, err := services.GetUser(userId, c)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
