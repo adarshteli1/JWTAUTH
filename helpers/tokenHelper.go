@@ -3,6 +3,7 @@ package helpers
 import (
 	"JWTAUTH/database"
 	"context"
+	"errors"
 	"log"
 	"os"
 	"time"
@@ -26,7 +27,7 @@ type SignedDetails struct {
 var userCollection *mongo.Collection = database.OpeCollection(database.Client, "user")
 var SECRET_KEY string = os.Getenv("SECRET_KEY")
 
-func ValidateToken(signedToken string) (claims *SignedDetails, msg string) {
+func ValidateToken(signedToken string) (*SignedDetails, error) {
 	token, err := jwt.ParseWithClaims(
 		signedToken,
 		&SignedDetails{},
@@ -35,21 +36,19 @@ func ValidateToken(signedToken string) (claims *SignedDetails, msg string) {
 		},
 	)
 	if err != nil {
-		msg = err.Error()
-		return
+		return nil, errors.New("Invalid Token")
 	}
+
 	claims, ok := token.Claims.(*SignedDetails)
 	if !ok {
-		msg = "Invalid Token"
-		return
+		return nil, errors.New("Invalid Token")
 	}
 
 	if claims.ExpiresAt < time.Now().Unix() {
-		msg = "Token is Expired"
-		return
+		return nil, errors.New("Token is expired")
 	}
 
-	return claims, msg
+	return claims, nil
 }
 
 func GenerateAllTokens(email string, firstname string, lastname string, uid string, userType string) (signedToken string, signedRefreshToken string, err error) {

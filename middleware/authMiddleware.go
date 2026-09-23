@@ -19,10 +19,14 @@ func Authenticate() gin.HandlerFunc {
 		}
 
 		claims, err := helpers.ValidateToken(clientToken)
-		if err != "" {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
-			c.Abort()
-			return
+		if err != nil {
+			if err.Error() == "Token is expired" {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Token is Expired"})
+			} else {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+				c.Abort()
+				return
+			}
 		}
 
 		c.Set("email", claims.Email)
