@@ -36,16 +36,12 @@ func ValidateToken(signedToken string) (*SignedDetails, error) {
 		},
 	)
 	if err != nil {
-		return nil, errors.New("Invalid Token")
+		return nil, err
 	}
 
 	claims, ok := token.Claims.(*SignedDetails)
 	if !ok {
 		return nil, errors.New("Invalid Token")
-	}
-
-	if claims.ExpiresAt < time.Now().Unix() {
-		return nil, errors.New("Token is expired")
 	}
 
 	return claims, nil
@@ -59,7 +55,7 @@ func GenerateAllTokens(email string, firstname string, lastname string, uid stri
 		Uid:        uid,
 		User_type:  userType,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(24)).Unix(),
+			ExpiresAt: time.Now().Local().Add(time.Minute * time.Duration(10)).Unix(),
 		},
 	}
 	refreshClaims := &SignedDetails{
@@ -69,7 +65,7 @@ func GenerateAllTokens(email string, firstname string, lastname string, uid stri
 		Uid:        uid,
 		User_type:  userType,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(168)).Unix(),
+			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(24)).Unix(),
 		},
 	}
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(SECRET_KEY))

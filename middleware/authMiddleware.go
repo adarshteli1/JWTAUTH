@@ -22,6 +22,8 @@ func Authenticate() gin.HandlerFunc {
 		if err != nil {
 			if err.Error() == "Token is expired" {
 				c.JSON(http.StatusUnauthorized, gin.H{"error": "Token is Expired"})
+				c.Abort()
+				return
 			} else {
 				c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 				c.Abort()
