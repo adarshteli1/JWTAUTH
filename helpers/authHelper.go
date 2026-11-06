@@ -23,12 +23,15 @@ func MatchUserTypeToUid(c *gin.Context, userId string) (err error) {
 	uid := c.GetString("uid")
 	err = nil
 
-	if userType == "USER" && uid != userId {
-		err = errors.New("Unauthorized to this resource")
-
+	if userType=="ADMIN"{
+		return nil
 	}
-	err = CheckUserType(c, userType)
-	return err
+
+	if userType == "USER" && uid != userId {
+		return nil
+	}
+	return errors.New("Unauthorized to this resource")
+	
 }
 func HashPassword(password string) string {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
