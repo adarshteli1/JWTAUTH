@@ -29,8 +29,8 @@ func main() {
 	router := gin.New()
 	router.Use(gin.Logger())
 
-	routes.AuthRoutes(router)
-	routes.UserRoutes(router)
+	routes.AuthRoutes(router,SecretKey string)
+	routes.UserRoutes(router,SecretKey string)
 
 	router.GET("/api-1", func(c *gin.Context) {
 		c.JSON(200, gin.H{"Sucess": "Access Gramted For api-1"})
