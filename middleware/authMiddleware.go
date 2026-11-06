@@ -18,7 +18,7 @@ func Authenticate(SecretKey string) gin.HandlerFunc {
 			return
 		}
 
-		claims, err := helpers.ValidateToken(clientToken)
+		claims, err := helpers.ValidateToken(clientToken,SecretKey)
 		if err != nil {
 			if err.Error() == "Token is expired" {
 				c.JSON(http.StatusUnauthorized, gin.H{"error": "Token is Expired"})
