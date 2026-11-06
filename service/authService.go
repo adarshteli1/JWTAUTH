@@ -132,7 +132,9 @@ func Login(user models.User) (LoginResponse, error) {
 		return LoginResponse{}, err
 	}
 
-	helpers.UpdateAllTokens(refreshToken, foundUser.User_id)
+	if err:=helpers.UpdateAllTokens(refreshToken, foundUser.User_id);err!=nil{
+		return LoginResponse{}.errors.New("Unable to Update Token")
+	}
 
 	return LoginResponse{
 		Token:        token,
