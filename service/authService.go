@@ -40,7 +40,10 @@ func Signup(user models.User) (SignupResponse, error) {
 		log.Panic(err)
 		return SignupResponse{}, errors.New("error while checking for the email")
 	}
-
+	if count > 0 {
+		return SignupResponse{}, errors.New("this email or phone number already exists")
+	}
+	
 	count, err = userCollection.CountDocuments(ctx, bson.M{"phone": user.Phone})
 	if err != nil {
 		log.Panic(err)
