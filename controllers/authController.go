@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Signup() gin.HandlerFunc {
+func Signup(SecretKey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user models.User
 
@@ -17,7 +17,7 @@ func Signup() gin.HandlerFunc {
 			return
 		}
 
-		result, err := services.Signup(user)
+		result, err := services.Signup(user,SecretKey)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return
@@ -27,7 +27,7 @@ func Signup() gin.HandlerFunc {
 	}
 }
 
-func Login() gin.HandlerFunc {
+func Login(SecretKey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user models.User
 
@@ -36,7 +36,7 @@ func Login() gin.HandlerFunc {
 			return
 		}
 
-		foundUser, err := services.Login(user)
+		foundUser, err := services.Login(user,SecretKey)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return
