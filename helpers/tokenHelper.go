@@ -79,7 +79,7 @@ func GenerateAllTokens(email string, firstname string, lastname string, uid stri
 	return token, refreshtoken, err
 }
 
-func UpdateAllTokens(signedRefreshToken string, userId string) {
+func UpdateAllTokens(signedRefreshToken string, userId string) error {
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 	defer cancel()
 	var updateObj primitive.D
@@ -104,8 +104,8 @@ func UpdateAllTokens(signedRefreshToken string, userId string) {
 		&opt,
 	)
 	if err != nil {
-		log.Panic(err)
-		return
+		return err
 	}
+	return nil
 
 }
