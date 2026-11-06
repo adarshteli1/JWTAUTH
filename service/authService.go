@@ -41,9 +41,6 @@ func Signup(user models.User) (SignupResponse, error) {
 		return SignupResponse{}, errors.New("error while checking for the email")
 	}
 
-	password := helpers.HashPassword(*user.Password)
-	user.Password = &password
-
 	count, err = userCollection.CountDocuments(ctx, bson.M{"phone": user.Phone})
 	if err != nil {
 		log.Panic(err)
@@ -54,6 +51,9 @@ func Signup(user models.User) (SignupResponse, error) {
 		return SignupResponse{}, errors.New("this email or phone number already exists")
 	}
 
+	password := helpers.HashPassword(*user.Password)
+	user.Password = &password
+	
 	user.Created_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 	user.Updated_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 
