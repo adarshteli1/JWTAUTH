@@ -25,14 +25,13 @@ type SignedDetails struct {
 }
 
 var userCollection *mongo.Collection = database.OpeCollection(database.Client, "user")
-var SECRET_KEY string = os.Getenv("SECRET_KEY")
 
-func ValidateToken(signedToken string) (*SignedDetails, error) {
+func ValidateToken(signedToken string,SecretKey string) (*SignedDetails, error) {
 	token, err := jwt.ParseWithClaims(
 		signedToken,
 		&SignedDetails{},
 		func(token *jwt.Token) (interface{}, error) {
-			return []byte(SECRET_KEY), nil
+			return []byte(SecretKey), nil
 		},
 	)
 	if err != nil {
