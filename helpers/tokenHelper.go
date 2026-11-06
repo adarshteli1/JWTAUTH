@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"log"
-	"os"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -42,11 +41,14 @@ func ValidateToken(signedToken string,SecretKey string) (*SignedDetails, error) 
 	if !ok {
 		return nil, errors.New("Invalid Token")
 	}
+	if !token.Valid {
+    	return nil, errors.New("Invalid Token")
+	}
 
 	return claims, nil
 }
 
-func GenerateAllTokens(email string, firstname string, lastname string, uid string, userType string) (signedToken string, signedRefreshToken string, err error) {
+func GenerateAllTokens(email string, firstname string, lastname string, uid string, userType string,SecretKey string) (signedToken string, signedRefreshToken string, err error) {
 	claims := &SignedDetails{
 		Email:      email,
 		First_name: firstname,
@@ -69,14 +71,12 @@ func GenerateAllTokens(email string, firstname string, lastname string, uid stri
 	}
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(SecretKey))
 	if err != nil {
-		log.Panic(err)
-		return
+		return "","",err
 	}
 	
 	refreshtoken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims).SignedString([]byte(SecretKey))
 	if err != nil {
-		log.Panic(err)
-		return
+		return "","",err
 	}
 
 	return token, refreshtoken, err
