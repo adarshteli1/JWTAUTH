@@ -86,10 +86,10 @@ func UpdateAllTokens(signedRefreshToken string, userId string) {
 
 	updateObj = append(updateObj, bson.E{Key: "refresh_token", Value: signedRefreshToken})
 
-	Updated_at, _ := time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+	Updated_at, _ := time.Now()	
 	updateObj = append(updateObj, bson.E{Key: "updated_at", Value: Updated_at})
 
-	upsert := true
+	upsert := false
 	filter := bson.M{"user_id": userId}
 	opt := options.UpdateOptions{
 		Upsert: &upsert,
@@ -103,7 +103,6 @@ func UpdateAllTokens(signedRefreshToken string, userId string) {
 		},
 		&opt,
 	)
-	defer cancel()
 	if err != nil {
 		log.Panic(err)
 		return
