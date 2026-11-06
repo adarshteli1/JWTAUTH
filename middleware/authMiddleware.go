@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Authenticate() gin.HandlerFunc {
+func Authenticate(SecretKey string) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
