@@ -26,7 +26,7 @@ type LoginResponse struct {
 
 var validate = validator.New()
 
-func Signup(user models.User) (SignupResponse, error) {
+func Signup(user models.User,SecretKey string) (SignupResponse, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 	defer cancel()
@@ -69,6 +69,7 @@ func Signup(user models.User) (SignupResponse, error) {
 		*user.Last_name,
 		user.User_id,
 		*user.User_type,
+		SecretKey,
 	)
 
 	user.Refresh_token = &refreshToken
@@ -95,7 +96,7 @@ func Signup(user models.User) (SignupResponse, error) {
 	}, nil
 }
 
-func Login(user models.User) (LoginResponse, error) {
+func Login(user models.User,SecretKey string) (LoginResponse, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 	defer cancel()
@@ -126,6 +127,8 @@ func Login(user models.User) (LoginResponse, error) {
 		*foundUser.Last_name,
 		foundUser.User_id,
 		*foundUser.User_type,
+		SecretKey,
+		
 	)
 
 	if err != nil {
