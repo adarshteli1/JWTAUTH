@@ -17,6 +17,11 @@ func main() {
 		log.Fatal("Error Loading the .env File")
 	}
 
+	SecretKey:=os.Getenv("SECRET_KEY")
+	if SecretKey== " " {
+		log.Fatal("Error Loading the SecretKey")
+	}
+	
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8000"
