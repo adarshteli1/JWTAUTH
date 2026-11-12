@@ -17,11 +17,11 @@ func main() {
 		log.Fatal("Error Loading the .env File")
 	}
 
-	SecretKey:=os.Getenv("SECRET_KEY")
-	if SecretKey== "" {
+	SecretKey := os.Getenv("SECRET_KEY")
+	if SecretKey == "" {
 		log.Fatal("Error Loading the SecretKey")
 	}
-	
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8000"
@@ -29,8 +29,8 @@ func main() {
 	router := gin.New()
 	router.Use(gin.Logger())
 
-	routes.AuthRoutes(router,SecretKey)
-	routes.UserRoutes(router,SecretKey)
+	routes.AuthRoutes(router, SecretKey)
+	routes.UserRoutes(router, SecretKey)
 
 	router.GET("/api-1", func(c *gin.Context) {
 		c.JSON(200, gin.H{"Sucess": "Access Gramted For api-1"})

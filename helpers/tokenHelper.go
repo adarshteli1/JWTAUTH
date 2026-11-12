@@ -4,7 +4,6 @@ import (
 	"JWTAUTH/database"
 	"context"
 	"errors"
-	"log"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -25,7 +24,7 @@ type SignedDetails struct {
 
 var userCollection *mongo.Collection = database.OpeCollection(database.Client, "user")
 
-func ValidateToken(signedToken string,SecretKey string) (*SignedDetails, error) {
+func ValidateToken(signedToken string, SecretKey string) (*SignedDetails, error) {
 	token, err := jwt.ParseWithClaims(
 		signedToken,
 		&SignedDetails{},
@@ -42,13 +41,13 @@ func ValidateToken(signedToken string,SecretKey string) (*SignedDetails, error) 
 		return nil, errors.New("Invalid Token")
 	}
 	if !token.Valid {
-    	return nil, errors.New("Invalid Token")
+		return nil, errors.New("Invalid Token")
 	}
 
 	return claims, nil
 }
 
-func GenerateAllTokens(email string, firstname string, lastname string, uid string, userType string,SecretKey string) (signedToken string, signedRefreshToken string, err error) {
+func GenerateAllTokens(email string, firstname string, lastname string, uid string, userType string, SecretKey string) (signedToken string, signedRefreshToken string, err error) {
 	claims := &SignedDetails{
 		Email:      email,
 		First_name: firstname,
@@ -71,12 +70,12 @@ func GenerateAllTokens(email string, firstname string, lastname string, uid stri
 	}
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(SecretKey))
 	if err != nil {
-		return "","",err
+		return "", "", err
 	}
-	
+
 	refreshtoken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims).SignedString([]byte(SecretKey))
 	if err != nil {
-		return "","",err
+		return "", "", err
 	}
 
 	return token, refreshtoken, err
@@ -89,7 +88,7 @@ func UpdateAllTokens(signedRefreshToken string, userId string) error {
 
 	updateObj = append(updateObj, bson.E{Key: "refresh_token", Value: signedRefreshToken})
 
-	Updated_at := time.Now()	
+	Updated_at := time.Now()
 	updateObj = append(updateObj, bson.E{Key: "updated_at", Value: Updated_at})
 
 	upsert := false
