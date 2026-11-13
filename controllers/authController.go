@@ -12,12 +12,12 @@ func Signup(SecretKey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user models.User
 
-		if err := c.BindJSON(&user); err != nil {
+		if err := c.ShouldBindJSON(&user); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		result, err := services.Signup(user,SecretKey)
+		result, err := services.Signup(user, SecretKey)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return
@@ -31,12 +31,12 @@ func Login(SecretKey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user models.User
 
-		if err := c.BindJSON(&user); err != nil {
+		if err := c.ShouldBindJSON(&user); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		foundUser, err := services.Login(user,SecretKey)
+		foundUser, err := services.Login(user, SecretKey)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return
