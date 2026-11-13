@@ -111,5 +111,5 @@ func GetUser(userId string, c *gin.Context) (models.User, error) {
 		return models.User{}, err
 	}
 
-	return models.User{}, nil
+	return user, nil
 }
