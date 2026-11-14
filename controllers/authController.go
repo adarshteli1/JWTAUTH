@@ -29,7 +29,7 @@ func Signup(SecretKey string) gin.HandlerFunc {
 
 func Login(SecretKey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var user models.User
+		var user models.LoginRequest
 
 		if err := c.ShouldBindJSON(&user); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

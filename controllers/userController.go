@@ -1,17 +1,11 @@
 package controllers
 
 import (
-	"JWTAUTH/database"
 	services "JWTAUTH/service"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
-	"go.mongodb.org/mongo-driver/mongo"
 )
-
-var userCollection *mongo.Collection = database.OpeCollection(database.Client, "user")
-var validate = validator.New()
 
 func GetUsers() gin.HandlerFunc {
 	return func(c *gin.Context) {

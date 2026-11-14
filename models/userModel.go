@@ -29,3 +29,19 @@ type UserResponse struct {
 	User_type  *string            `json:"user_type" `
 	User_id    string             `json:"user_id"`
 }
+
+type SignupResponse struct {
+	User         UserResponse `json:"user"`
+	Token        string       `json:"token"`
+	RefreshToken string       `json:"refresh_token"`
+}
+
+type LoginResponse struct {
+	Token        string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
+type LoginRequest struct {
+	Email    string  `json:"email" bson:"email" validate:"email,required"`
+	Password *string `json:"password" bson:"password" validate:"required,min=6"`
+}

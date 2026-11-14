@@ -96,19 +96,19 @@ func GetUsers(c *gin.Context) ([]bson.M, error) {
 	return allUsers, nil
 }
 
-func GetUser(userId string, c *gin.Context) (models.User, error) {
+func GetUser(userId string, c *gin.Context) (models.UserResponse, error) {
 
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 100*time.Second)
 	defer cancel()
 
-	var user models.User
+	var user models.UserResponse
 
 	err := userCollection.FindOne(ctx, bson.M{
 		"user_id": userId,
 	}).Decode(&user)
 
 	if err != nil {
-		return models.User{}, err
+		return models.UserResponse{}, err
 	}
 
 	return user, nil
