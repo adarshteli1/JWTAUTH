@@ -32,9 +32,9 @@ func main() {
 	routes.AuthRoutes(router, SecretKey)
 	routes.UserRoutes(router, SecretKey)
 
-	router.GET("/api-1", func(c *gin.Context) {
-		c.JSON(200, gin.H{"Sucess": "Access Gramted For api-1"})
-	})
+	router.GET("/api-1", func(c *gin.Context) {  //For Future Testing
+		c.JSON(200, gin.H{"Sucess": "Access Gramted For api-1"}) 
+	}) 
 
 	router.Run(":" + port)
 }
